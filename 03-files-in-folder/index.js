@@ -9,17 +9,23 @@ fs.readdir(folderPath, (err, files) => {
     process.exit(1);
   }
 
-  const filePaths = files.map((file) => path.join(folderPath, file));
-  const fileStats = filePaths.filter((filePath) =>
-    fs.statSync(filePath).isFile(),
-  );
+  files.forEach((file) => {
+    const filePath = path.join(folderPath, file);
 
-  fileStats.forEach((fileStat) => {
-    const fileNameWithExtension = path.basename(fileStat);
-    const fileName = path.parse(fileNameWithExtension).name;
-    const fileExtension = path.extname(fileStat).slice(1);
-    const fileSize = (fs.statSync(fileStat).size / 1024).toFixed(3);
+    fs.stat(filePath, (statErr, fileStat) => {
+      if (statErr) {
+        console.error(`Error processing file ${filePath}:`, statErr);
+        return;
+      }
 
-    console.log(`${fileName}-${fileExtension}-${fileSize}kb`);
+      if (fileStat.isFile()) {
+        const fileNameWithExtension = path.basename(filePath);
+        const fileName = path.parse(fileNameWithExtension).name;
+        const fileExtension = path.extname(filePath).slice(1);
+        const fileSize = (fileStat.size / 1024).toFixed(3);
+
+        console.log(`${fileName}-${fileExtension}-${fileSize}kb`);
+      }
+    });
   });
 });

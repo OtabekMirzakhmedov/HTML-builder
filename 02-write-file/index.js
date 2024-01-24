@@ -1,7 +1,7 @@
 const fs = require('fs');
 const { stdin, stdout } = process;
 
-const output = fs.createWriteStream('output.txt');
+const output = fs.createWriteStream('./02-write-file/output.txt');
 
 stdin.setEncoding('utf-8');
 
@@ -12,7 +12,13 @@ process.on('SIGINT', () => {
 });
 
 stdin.on('data', (chunk) => {
-  output.write(chunk);
+  const input = chunk.trim();
+  if (input.toLowerCase() === 'exit') {
+    process.exit();
+  }
+
+  // Write the input to the file
+  output.write(input + '\n');
 });
 
 process.on('exit', () => {
